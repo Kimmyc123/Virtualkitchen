@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Virtual Lentil Soup Kitchen
+  </title>
+  <style>
+   body {
+margin: 0;
+padding: 0;
+font-family: 'Arial', sans-serif;
+background-image: url('https://i.imgur.com/fLwIXWY.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+overflow: hidden;
+height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+#door-container {
+position: relative;
+width: 300px;
+height: 500px;
+cursor: pointer;
+transition: transform 0.5s ease;
+perspective: 1000px;
+}
+#door {
+position: absolute;
+width: 100%;
+height: 100%;
+background-color: #8b4513;
+border: 10px solid #5a2d0c;
+border-radius: 10px;
+box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+transform-origin: left;
+transition: transform 1.5s ease;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+#door-knocker {
+width: 30px;
+height: 30px;
+background-color: #c0a080;
+border-radius: 50%;
+position: absolute;
+right: 20px;
+top: 50%;
+}
+#welcome-message {
+position: absolute;
+font-size: 56px;
+color: #fff;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+opacity: 0;
+transition: opacity 1s ease;
+z-index: 1;
+}
+#kitchen-container {
+display: none;
+width: 100vw;
+height: 100vh;
+background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20240415/pngtree-gas-stove-with-hob-in-kitchen-close-up-image_15654968.jpg');
+background-size: cover;
+background-position: center;
+position: relative;
+}
+#kitchen-content {
+display: flex;
+height: 100%;
+}
+#ingredients-panel {
+width: 30%;
+background-color: rgba(255, 248, 220, 0.9);
+padding: 20px;
+overflow-y: auto;
+height: 100%;
+box-sizing: border-box;
+}
+#cooking-area {
+width: 70%;
+display: flex;
+flex-direction: column;
+position: relative;
+}
+#pot-container {
+flex: 2;
+display: flex;
+justify-content: center;
+align-items: center;
+position: relative;
+}
+#nutrition-panel {
+flex: 1;
+background-color: rgba(240, 248, 255, 0.9);
+padding: 20px;
+overflow-y: auto;
+}
+#pot {
+width: 500px;
+height: 400px;
+background-color: #555;
+border-radius: 0 0 150px 150px;
+position: relative;
+display: flex;
+justify-content: center;
+align-items: center;
+overflow: hidden;
+}
+#pot:before {
+content: '';
+position: absolute;
+width: 420px;
+height: 40px;
+background-color: #777;
+top: -20px;
+border-radius: 20px;
+}
+#pot-contents {
+width: 450px;
+height: 350px;
+background-color: #e6b87a;
+border-radius: 0 0 140px 140px;
+position: relative;
+overflow: hidden;
+transition: background-color 0.5s ease;
+}
+#stove {
+width: 400px;
+height: 50px;
+background-color: #333;
+position: absolute;
+bottom: -30px;
+border-radius: 10px;
+}
+#flame {
+width: 150px;
+height: 20px;
+background: radial-gradient(ellipse at center, #ff4500, #ff8c00);
+border-radius: 50%;
+position: absolute;
+bottom: -5px;
+left: 125px;
+filter: blur(5px);
+animation: flicker 0.5s infinite alternate;
+}
+@keyframes flicker {
+0% { opacity: 0.7; }
+100% { opacity: 1; }
+}
+.ingredient-item {
+background-color: #fff;
+border: 1px solid #ddd;
+border-radius: 8px;
+padding: 10px;
+margin-bottom: 10px;
+cursor: grab;
+transition: all 0.3s ease;
+}
+.ingredient-item:hover {
+transform: translateY(-5px);
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.add-ingredient-btn {
+background-color: #4CAF50;
+color: white;
+padding: 8px 12px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+font-weight: bold;
+margin-top: 10px;
+transition: background-color 0.3s;
+}
+.add-ingredient-btn:hover {
+background-color: #45a049;
+}
+.ingredient-item h3 {
+margin-top: 0;
+}
+.ingredient-item img {
+width: 50px;
+height: 50px;
+border-radius: 25px;
+margin-right: 10px;
+float: left;
+}
+.ingredient-in-pot {
+position: absolute;
+width: 30px;
+height: 30px;
+border-radius: 15px;
+animation: bobbing 3s infinite ease-in-out;
+}
+@keyframes bobbing {
+0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-10px); }
+}
+#nutrition-totals {
+margin-top: 20px;
+padding: 10px;
+background-color: #fff;
+border-radius: 8px;
+}
+#clear-pot {
+position: absolute;
+bottom: 20px;
+right: 20px;
+padding: 10px 20px;
+background-color: #ff6b6b;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-weight: bold;
+}
+.ingredient-tag {
+display: inline-block;
+background-color: #4caf50;
+color: white;
+padding: 5px 10px;
+border-radius: 20px;
+margin: 2px;
+font-size: 14px;
+}
+.remove-ingredient {
+cursor: pointer;
+margin-left: 5px;
+}
+#pot-ingredients {
+position: absolute;
+bottom: 10px;
+left: 10px;
+right: 10px;
+display: flex;
+flex-wrap: wrap;
+}
+  </style>
+ </head>
+ <body>
+  <div id="door-container">
+   <div id="welcome-message">
+    Welcome!
+   </div>
+   <div id="door">
+    <div id="door-knocker">
+    </div>
+   </div>
+  </div>
+  <div id="kitchen-container">
+   <div id="kitchen-content">
+    <div id="ingredients-panel">
+     <h2>
+      Ingredients
+     </h2>
+     <div id="ingredients-list">
+     </div>
+    </div>
+    <div id="cooking-area">
+     <div id="pot-container">
+      <div id="pot">
+       <div id="pot-contents">
+        <div id="pot-ingredients">
+        </div>
+       </div>
+       <div id="stove">
+        <div id="flame">
+        </div>
+       </div>
+      </div>
+     </div>
+     <div id="nutrition-panel">
+      <h2>
+       Nutritional Information
+      </h2>
+      <div id="nutrition-totals">
+       <h3>
+        Lentil Soup Nutrition
+       </h3>
+       <p>
+        Calories:
+        <span id="total-calories">
+         0
+        </span>
+       </p>
+       <p>
+        Protein:
+        <span id="total-protein">
+         0
+        </span>
+        g
+       </p>
+       <p>
+        Carbs:
+        <span id="total-carbs">
+         0
+        </span>
+        g
+       </p>
+       <p>
+        Fat:
+        <span id="total-fat">
+         0
+        </span>
+        g
+       </p>
+       <p>
+        Fiber:
+        <span id="total-fiber">
+         0
+        </span>
+        g
+       </p>
+      </div>
+      <button id="clear-pot">
+       Clear Pot
+      </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+   // List of ingredients with nutritional information
+const ingredients = [
+{
+name: "Green Lentils",
+image: "https://media.istockphoto.com/id/182841177/photo/lentil.jpg?s=612x612&w=0&k=20&c=GN0cD50SC7LZ2CNqj0b_bw6WJReCQtBC6JBT7T23HLk=",
+nutrition: {
+calories: 230,
+protein: 18,
+carbs: 40,
+fat: 1,
+fiber: 16
+},
+description: "Earthy flavor, firm texture, holds shape well when cooked"
+},
+{
+name: "Brown Lentils",
+image: "https://m.media-amazon.com/images/I/81bwt1O+3DL.jpg",
+nutrition: {
+calories: 230,
+protein: 18,
+carbs: 39,
+fat: 1,
+fiber: 15
+},
+description: "Mild earthy flavor, versatile for many dishes"
+},
+{
+name: "Red Lentils",
+image: "https://www.keepingthepeas.com/wp-content/uploads/2022/11/red-lentils-in-wood-bowl-500x375.jpg",
+nutrition: {
+calories: 230,
+protein: 18,
+carbs: 39,
+fat: 1,
+fiber: 15
+},
+description: "Sweet and nutty, cook quickly and turn soft"
+},
+{
+name: "Onion",
+image: "data:image/jpeg;base64,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",
+nutrition: {
+calories: 44,
+protein: 1,
+carbs: 10,
+fat: 0,
+fiber: 2
+},
+description: "Adds aromatic flavor base to the soup"
+},
+{
+name: "Carrots",
+image: "https://cdn11.bigcommerce.com/s-kc25pb94dz/images/stencil/1280x1280/products/271/762/Carrot__40927.1634584458.jpg?c=2",
+nutrition: {
+calories: 50,
+protein: 1,
+carbs: 12,
+fat: 0,
+fiber: 3
+},
+description: "Sweet flavor and vibrant color"
+},
+{
+name: "Celery",
+image: "data:image/jpeg;base64,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",
+nutrition: {
+calories: 16,
+protein: 0.7,
+carbs: 3,
+fat: 0.2,
+fiber: 1.6
+},
+description: "Adds a savory depth and slight crunch"
+},
+{
+name: "Garlic",
+image: "https://media.loveitopcdn.com/22794/cu-toi.jpg",
+nutrition: {
+calories: 15,
+protein: 0.6,
+carbs: 3,
+fat: 0,
+fiber: 0.2
+},
+description: "Aromatic flavor enhancer"
+},
+{
+name: "Olive Oil",
+image: "https://comfygirlwithcurls.com/wp-content/uploads/2019/07/blur-close-up-cook-33783.jpg",
+nutrition: {
+calories: 120,
+protein: 0,
+carbs: 0,
+fat: 14,
+fiber: 0
+},
+description: "Adds richness and helps sauté vegetables"
+},
+{
+name: "Ground Cumin",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 8,
+protein: 0.4,
+carbs: 1,
+fat: 0.5,
+fiber: 0.2
+},
+description: "Warm, earthy spice that complements lentils"
+},
+{
+name: "Ground Coriander",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 5,
+protein: 0.2,
+carbs: 1,
+fat: 0.3,
+fiber: 0.2
+},
+description: "Citrusy, floral notes that brighten the soup"
+},
+{
+name: "Ground Turmeric",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 8,
+protein: 0.2,
+carbs: 1.4,
+fat: 0.2,
+fiber: 0.5
+},
+description: "Earthy flavor and golden color"
+},
+{
+name: "Vegetable Broth",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 15,
+protein: 1,
+carbs: 3,
+fat: 0,
+fiber: 0
+},
+description: "Liquid base that adds savory flavor"
+},
+{
+name: "Spinach",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 23,
+protein: 2.9,
+carbs: 3.6,
+fat: 0.4,
+fiber: 2.2
+},
+description: "Nutrient-rich leafy green that wilts into the soup"
+},
+{
+name: "Tomatoes",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 32,
+protein: 1.6,
+carbs: 7,
+fat: 0.4,
+fiber: 2.2
+},
+description: "Adds acidity and sweetness"
+},
+{
+name: "Bell Peppers",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 31,
+protein: 1,
+carbs: 6,
+fat: 0.3,
+fiber: 2.1
+},
+description: "Sweet, colorful addition"
+},
+{
+name: "Sweet Potato",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 86,
+protein: 1.6,
+carbs: 20,
+fat: 0.1,
+fiber: 3
+},
+description: "Adds natural sweetness and heartiness"
+},
+{
+name: "Plant-Based Sausage",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 220,
+protein: 25,
+carbs: 6,
+fat: 12,
+fiber: 3
+},
+description: "Savory meat alternative with protein"
+},
+{
+name: "Seitan",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 370,
+protein: 75,
+carbs: 14,
+fat: 2,
+fiber: 0
+},
+description: "Wheat-based protein with chewy texture"
+},
+{
+name: "Tofu",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 144,
+protein: 15.6,
+carbs: 3.5,
+fat: 8.7,
+fiber: 2.3
+},
+description: "Soy protein that absorbs flavors well"
+},
+{
+name: "Tempeh",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 195,
+protein: 20.3,
+carbs: 7.6,
+fat: 11.3,
+fiber: 4.2
+},
+description: "Fermented soy with nutty flavor"
+},
+{
+name: "Kale",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 49,
+protein: 4.3,
+carbs: 8.8,
+fat: 0.9,
+fiber: 3.6
+},
+description: "Hearty green with robust texture"
+},
+{
+name: "Quinoa",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 120,
+protein: 4.4,
+carbs: 21.3,
+fat: 1.9,
+fiber: 2.8
+},
+description: "Protein-rich grain that adds texture"
+},
+{
+name: "Fresh Thyme",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 5,
+protein: 0.3,
+carbs: 1.1,
+fat: 0.1,
+fiber: 0.7
+},
+description: "Aromatic herb with earthy flavor"
+},
+{
+name: "Bay Leaf",
+image: "/api/placeholder/100/100",
+nutrition: {
+calories: 2,
+protein: 0.1,
+carbs: 0.5,
+fat: 0.1,
+fiber: 0.2
+},
+description: "Subtle flavor enhancer (remove before eating)"
+}
+];
+// Variables to track nutritional totals
+let nutritionTotals = {
+calories: 0,
+protein: 0,
+carbs: 0,
+fat: 0,
+fiber: 0
+};
+let potIngredients = [];
+// When the page loads
+document.addEventListener('DOMContentLoaded', function() {
+const door = document.getElementById('door');
+const welcomeMessage = document.getElementById('welcome-message');
+const doorContainer = document.getElementById('door-container');
+const kitchenContainer = document.getElementById('kitchen-container');
+const ingredientsList = document.getElementById('ingredients-list');
+const clearPotButton = document.getElementById('clear-pot');
+const potContents = document.getElementById('pot-contents');
+const potIngredientsDisplay = document.getElementById('pot-ingredients');
+// Populate the ingredients list
+ingredients.forEach((ingredient, index) => {
+const ingredientItem = document.createElement('div');
+ingredientItem.className = 'ingredient-item';
+ingredientItem.dataset.index = index;
+ingredientItem.innerHTML = `
+<img src="${ingredient.image}" alt="${ingredient.name}">
+<h3>${ingredient.name}</h3>
+<p>${ingredient.description}</p>
+<p><strong>Nutrition per serving:</strong></p>
+<p>Calories: ${ingredient.nutrition.calories} |
+Protein: ${ingredient.nutrition.protein}g |
+Carbs: ${ingredient.nutrition.carbs}g |
+Fat: ${ingredient.nutrition.fat}g |
+Fiber: ${ingredient.nutrition.fiber}g</p>
+<button class="add-ingredient-btn">Add to Pot</button>
+`;
+ingredientsList.appendChild(ingredientItem);
+// Add click event listener to the button
+ingredientItem.querySelector('.add-ingredient-btn').addEventListener('click', function() {
+addIngredientToPot(index);
+});
+});
+// Door click event
+door.addEventListener('click', function() {
+welcomeMessage.style.opacity = '1';
+setTimeout(() => {
+door.style.transform = 'rotateY(-110deg)';
+setTimeout(() => {
+doorContainer.style.display = 'none';
+kitchenContainer.style.display = 'block';
+}, 1500);
+}, 1000);
+});
+// Make the pot a drop target
+const pot = document.getElementById('pot');
+pot.addEventListener('dragover', function(event) {
+event.preventDefault();
+});
+pot.addEventListener('drop', function(event) {
+event.preventDefault();
+const ingredientIndex = event.dataTransfer.getData('text/plain');
+addIngredientToPot(ingredientIndex);
+});
+// Clear pot button event
+clearPotButton.addEventListener('click', function() {
+potIngredients = [];
+potIngredientsDisplay.innerHTML = '';
+updateNutritionTotals();
+updatePotAppearance();
+});
+// Function to add ingredient to pot
+function addIngredientToPot(index) {
+const ingredient = ingredients[index];
+// Add to pot ingredients array
+potIngredients.push(ingredient);
+// Create tag in pot
+const tag = document.createElement('span');
+tag.className = 'ingredient-tag';
+tag.innerHTML = `${ingredient.name} <span class="remove-ingredient" data-name="${ingredient.name}">×</span>`;
+potIngredientsDisplay.appendChild(tag);
+// Add click event to remove ingredient
+tag.querySelector('.remove-ingredient').addEventListener('click', function() {
+const ingredientName = this.dataset.name;
+removeIngredientFromPot(ingredientName, tag);
+});
+// Update nutrition totals
+updateNutritionTotals();
+// Update pot appearance based on ingredients
+updatePotAppearance();
+}
+// Function to remove ingredient from pot
+function removeIngredientFromPot(ingredientName, tagElement) {
+const index = potIngredients.findIndex(item => item.name === ingredientName);
+if (index !== -1) {
+potIngredients.splice(index, 1);
+tagElement.remove();
+updateNutritionTotals();
+updatePotAppearance();
+}
+}
+// Function to update the nutrition totals
+function updateNutritionTotals() {
+// Reset totals
+nutritionTotals = {
+calories: 0,
+protein: 0,
+carbs: 0,
+fat: 0,
+fiber: 0
+};
+// Calculate new totals
+potIngredients.forEach(ingredient => {
+nutritionTotals.calories += ingredient.nutrition.calories;
+nutritionTotals.protein += ingredient.nutrition.protein;
+nutritionTotals.carbs += ingredient.nutrition.carbs;
+nutritionTotals.fat += ingredient.nutrition.fat;
+nutritionTotals.fiber += ingredient.nutrition.fiber;
+});
+// Update display
+document.getElementById('total-calories').textContent = nutritionTotals.calories.toFixed(1);
+document.getElementById('total-protein').textContent = nutritionTotals.protein.toFixed(1);
+document.getElementById('total-carbs').textContent = nutritionTotals.carbs.toFixed(1);
+document.getElementById('total-fat').textContent = nutritionTotals.fat.toFixed(1);
+document.getElementById('total-fiber').textContent = nutritionTotals.fiber.toFixed(1);
+}
+// Function to update pot appearance based on ingredients
+function updatePotAppearance() {
+let baseColor = "#e6b87a"; // Default color
+if (potIngredients.length > 0) {
+// Check for specific ingredients to change color
+if (potIngredients.some(i => i.name === "Red Lentils")) {
+baseColor = "#d35400"; // Orange-red for red lentils
+} else if (potIngredients.some(i => i.name === "Green Lentils")) {
+baseColor = "#606c38"; // Greenish for green lentils
+} else if (potIngredients.some(i => i.name === "Brown Lentils")) {
+baseColor = "#8b5a2b"; // Brown for brown lentils
+}
+// Modify color based on other ingredients
+if (potIngredients.some(i => i.name === "Tomatoes")) {
+baseColor = mixColors(baseColor, "#c0392b", 0.3); // More reddish
+}
+if (potIngredients.some(i => i.name === "Turmeric")) {
+baseColor = mixColors(baseColor, "#f39c12", 0.2); // More yellowish
+}
+if (potIngredients.some(i => i.name === "Spinach") || potIngredients.some(i => i.name === "Kale")) {
+baseColor = mixColors(baseColor, "#27ae60", 0.2); // More greenish
+}
+}
+potContents.style.backgroundColor = baseColor;
+}
+// Helper function to mix colors
+function mixColors(color1, color2, weight) {
+function hex2rgb(hex) {
+const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+return result ? {
+r: parseInt(result[1], 16),
+g: parseInt(result[2], 16),
+b: parseInt(result[3], 16)
+} : null;
+}
+function rgb2hex(rgb) {
+return "#" + ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
+}
+const c1 = hex2rgb(color1);
+const c2 = hex2rgb(color2);
+if (!c1 || !c2) return color1;
+const w = weight;
+const w2 = 1 - w;
+const rgb = {
+r: Math.round(c1.r * w2 + c2.r * w),
+g: Math.round(c1.g * w2 + c2.g * w),
+b: Math.round(c1.b * w2 + c2.b * w)
+};
+return rgb2hex(rgb);
+}
+});
+  </script>
+ </body>
+</html>
